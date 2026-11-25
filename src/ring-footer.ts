@@ -12,15 +12,17 @@ import { createHash } from 'node:crypto'
 import { descriptor, footerHtml, footerHtmlSync, subscribeForm, type FooterOptions } from '@profullstack/footer'
 
 /** The ring member URL (the web2 hostname; hops are measured from it). */
-export const RING_SITE = 'https://pay.agent.pit.world/'
+export const RING_SITE = 'https://security.agent.pit.world/'
 
 const OPTIONS: FooterOptions = {
   site: RING_SITE,
-  name: 'pay.agent',
+  name: 'security.agent',
   links: [
-    { label: 'Help', href: '/help' },
-    { label: 'Source', href: 'https://github.com/moshcoder/pay.agent' },
-    { label: 'Payments by CoinPay', href: 'https://coinpayportal.com' },
+    { label: 'Connect an agent', href: '/connect' },
+    { label: 'Source', href: 'https://github.com/moshcoder/security.agent' },
+    { label: 'Powered by ThreatCrush', href: '/go/threatcrush' },
+    { label: 'c0mpute', href: '/go/c0mpute' },
+    { label: 'W3BS desktop', href: '/go/w3bs' },
   ],
 }
 
@@ -40,7 +42,7 @@ let cached = footerHtmlSync(OPTIONS)
 export const ringFooter = (): string => cached
 
 /** /.well-known/openwebring.json */
-export const ringDescriptor = () => descriptor({ site: RING_SITE, name: 'pay.agent' })
+export const ringDescriptor = () => descriptor({ site: RING_SITE, name: 'security.agent' })
 
 export function startRingFooterRefresh(everyMs = 15 * 60_000): () => void {
   const refresh = () =>

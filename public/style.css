@@ -93,3 +93,36 @@ details summary { cursor: pointer; font-weight: 600; }
 @media (max-width: 640px) { .ring-bar .ring-home span { display: none; } }
 footer.pfs-footer { max-width: 760px; margin: 2rem auto 0; color: var(--muted); border-top-color: var(--line); --pfs-footer-muted: var(--muted); --pfs-footer-size: .88rem; }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* security.agent */
+.check { margin: 1.5rem 0 .5rem; }
+.check .row > input { flex: 3; min-width: 14rem; }
+.check .row > .btn { flex: 0 0 auto; }
+.error { border-left: 3px solid var(--fail); padding: .5rem .9rem; background: var(--panel); border-radius: 0 8px 8px 0; }
+.ok-note { border-left: 3px solid var(--ok); padding: .5rem .9rem; background: var(--panel); border-radius: 0 8px 8px 0; }
+.small-btn { padding: .25rem .7rem; font-size: .85rem; margin-left: .4rem; }
+.result, .analysis, .desktop { margin: 1rem 0; }
+.verdict { display: flex; gap: .7rem; align-items: center; flex-wrap: wrap; font-size: 1.05rem; margin: 0 0 .4rem; }
+.verdict span { font-weight: 800; padding: .1rem .6rem; border-radius: 999px; border: 1px solid currentColor; }
+.verdict.bad span { color: var(--fail); }
+.verdict.warn span { color: var(--warn); }
+.verdict.ok span { color: var(--ok); }
+.verdict.unknown span { color: var(--muted); }
+.analysis { border-left: 3px solid var(--accent); }
+.analysis h3 { margin: 0 0 .4rem; font-size: 1rem; }
+.sev { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+.sev-critical, .sev-high { color: var(--fail); }
+.sev-medium { color: var(--warn); }
+.sev-low, .sev-info { color: var(--muted); }
+.tools td { vertical-align: top; }
+.stack { display: grid; gap: .8rem; }
+.stack label { display: grid; gap: .3rem; }
+.diagram { width: 100%; height: auto; margin: .8rem 0; }
+.diagram .d-box { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+.diagram .d-line { fill: none; stroke: var(--muted); stroke-width: 2; }
+.diagram .d-accent { stroke: var(--accent); }
+.diagram text { text-anchor: middle; fill: var(--text); font: 13px ui-sans-serif, system-ui, sans-serif; }
+.diagram .d-title { font-weight: 800; font-size: 15px; }
+.diagram .d-mono { font-family: ui-monospace, Menlo, monospace; font-size: 12px; fill: var(--accent); }
+.diagram .d-small { font-size: 11.5px; fill: var(--muted); }
+.diagram .d-text { fill: var(--text); }

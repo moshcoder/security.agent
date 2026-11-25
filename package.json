@@ -1,18 +1,19 @@
 {
-  "name": "@profullstack/payagent",
-  "version": "0.8.1",
-  "description": "pay.agent: get paid in crypto with one link, Venmo for the agentic web. Sign in with CoinPay; pay anyone by handle from the web, API, CLI, TUI or MCP.",
+  "name": "@profullstack/securityagent",
+  "version": "0.1.0",
+  "description": "security.agent: a security team for your AI agent. Sign in with ThreatCrush (OAuth 2.1) and check IPs, domains and files, read findings and incidents, from the web, API, CLI, TUI or MCP.",
   "license": "MIT",
   "type": "module",
-  "homepage": "https://pay.agent",
+  "homepage": "https://security.agent.pit.world",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moshcoder/pay.agent.git"
+    "url": "git+https://github.com/moshcoder/security.agent.git"
   },
+  "keywords": ["security", "threatcrush", "mcp", "ai-agent", "oauth", "reputation", "antivirus", "cli"],
   "bin": {
-    "payagent": "bin/payagent"
+    "securityagent": "bin/securityagent"
   },
-  "files": ["bin/payagent", "src", "public", "README.md", "LICENSE"],
+  "files": ["bin/securityagent", "src", "public", "README.md", "LICENSE"],
   "engines": {
     "bun": ">=1.1"
   },
@@ -24,21 +25,17 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
-    "@profullstack/coinpay-onboard": "0.2.0",
+    "@profullstack/ai-providers": "^0.3.2",
     "@profullstack/footer": "latest",
     "@profullstack/hqtui": "^0.11.1",
-    "@profullstack/sealed-secrets": "0.1.0",
-    "@profullstack/webhooks": "0.2.1",
     "hono": "^4.13.14",
-    "qrcode": "^1.5.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
-    "@types/qrcode": "^1.5.6",
     "typescript": "^7.0.2"
   },
-  "overrides": {
-    "zod": "^4.6.7"
+  "publishConfig": {
+    "access": "public"
   }
 }
