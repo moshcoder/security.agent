@@ -7,11 +7,11 @@
 #
 # Makes: user secagent-tunnel (no password, no shell, no home files), the
 # AuthorizedKeysCommand script, the sshd Match block, and the keys file the app
-# writes (/var/lib/security-agent/tunnel_authorized_keys, owned by the app user).
+# writes (/var/lib/security-agent-tunnel/tunnel_authorized_keys, owned by the app user).
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 APP_USER=${APP_USER:-securityagent}
-KEYS=/var/lib/security-agent/tunnel_authorized_keys
+KEYS=/var/lib/security-agent-tunnel/tunnel_authorized_keys
 CONF=/etc/ssh/sshd_config.d/60-security-agent-tunnel.conf
 
 [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
@@ -24,13 +24,10 @@ passwd -l secagent-tunnel >/dev/null 2>&1 || true
 install -d -o root -g root -m 755 /usr/local/lib/security-agent
 install -o root -g root -m 755 "$HERE/authorized-keys" /usr/local/lib/security-agent/authorized-keys
 
-install -d -m 755 /var/lib/security-agent
-if id "$APP_USER" >/dev/null 2>&1; then
-  [ -f "$KEYS" ] || install -o "$APP_USER" -g "$APP_USER" -m 644 /dev/null "$KEYS"
-  chown "$APP_USER:$APP_USER" "$KEYS"
-else
-  [ -f "$KEYS" ] || install -m 644 /dev/null "$KEYS"
-fi
+# The app rewrites the file by rename, so it owns the directory; sshd's `nobody` only reads it.
+id "$APP_USER" >/dev/null 2>&1 || { echo "create the app user $APP_USER first (deploy/install-dev2.sh does)" >&2; exit 1; }
+install -d -o "$APP_USER" -g "$APP_USER" -m 755 /var/lib/security-agent-tunnel
+[ -f "$KEYS" ] || install -o "$APP_USER" -g "$APP_USER" -m 644 /dev/null "$KEYS"
 
 backup=""
 if [ -f "$CONF" ] && ! cmp -s "$HERE/sshd-security-agent.conf" "$CONF"; then

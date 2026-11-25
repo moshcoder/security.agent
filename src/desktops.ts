@@ -30,7 +30,7 @@
  */
 import type { Database } from 'bun:sqlite'
 import { randomBytes } from 'node:crypto'
-import { renameSync, writeFileSync } from 'node:fs'
+import { chmodSync, renameSync, writeFileSync } from 'node:fs'
 import { request } from 'node:http'
 import type { Sealer } from './db.js'
 
@@ -131,6 +131,8 @@ export class Desktops {
     if (!this.keysFile) return
     const tmp = `${this.keysFile}.tmp-${process.pid}`
     writeFileSync(tmp, this.authorizedKeys(), { mode: 0o644 })
+    // The service runs with UMask=0077; sshd reads this as `nobody`. Public keys and restrictions only.
+    chmodSync(tmp, 0o644)
     renameSync(tmp, this.keysFile)
   }
 }
