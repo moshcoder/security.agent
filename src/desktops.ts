@@ -33,6 +33,7 @@ import { randomBytes } from 'node:crypto'
 import { chmodSync, renameSync, writeFileSync } from 'node:fs'
 import { request } from 'node:http'
 import type { Sealer } from './db.js'
+import { VERSION } from './version.js'
 
 export const PORT_MIN = 20000
 export const PORT_MAX = 29999
@@ -201,7 +202,7 @@ let rpcId = 0
 async function brokerSession(d: Desktop, token: string): Promise<string> {
   const known = sessions.get(d.id)
   if (known && known.at > Date.now() - 10 * 60_000) return known.id
-  const r = await brokerHttp(d, token, 'POST', { jsonrpc: '2.0', id: ++rpcId, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'security.agent', version: '0.1.0' } } }, null)
+  const r = await brokerHttp(d, token, 'POST', { jsonrpc: '2.0', id: ++rpcId, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'security.agent', version: VERSION } } }, null)
   if (r.status === 401) throw new DesktopError('The desktop refused our agent token. Make a new one with `w3bs desktop agents add security-agent` and update the desktop here.', 401)
   if (r.status === 403 || r.status === 421) throw new DesktopError('The desktop broker refused the connection. Is it started with --mcp-http 127.0.0.1:7801?', 502)
   if (r.status === 404) throw new DesktopError('The desktop broker has MCP over HTTP off. Start it with `w3bs desktop daemon --mcp-http 127.0.0.1:7801`.', 502)

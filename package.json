@@ -1,6 +1,6 @@
 {
   "name": "@profullstack/securityagent",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "security.agent: a security team for your AI agent. Sign in with ThreatCrush (OAuth 2.1) and check IPs, domains and files, read findings and incidents, from the web, API, CLI, TUI or MCP.",
   "license": "MIT",
   "type": "module",
