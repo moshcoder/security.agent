@@ -571,6 +571,7 @@ export function serve(options: { port?: number; hostname?: string } = {}) {
     fetch(request, srv) {
       const peer = srv.requestIP(request)?.address ?? ''
       const forwarded = trustProxy && (peer === '127.0.0.1' || peer === '::1' || peer === '::ffff:127.0.0.1') ? request.headers.get('x-real-ip') : null
+      // threatcrush-disable-next-line js-ssrf-outbound-request  not an outbound request: Hono's in-process dispatch of the incoming request
       return app.fetch(request, { ip: forwarded || peer })
     },
   })
