@@ -9,4 +9,4 @@
 [ "$1" = "secagent-tunnel" ] || exit 0
 FILE=${SECAGENT_TUNNEL_KEYS_TEST:-/var/lib/security-agent-tunnel/tunnel_authorized_keys}
 [ -r "$FILE" ] || exit 0
-exec grep -E '^restrict,port-forwarding,permitlisten="localhost:2[0-9]{4}",permitopen="none",command="/bin/false" (ssh-ed25519|sk-ssh-ed25519@openssh\.com|ecdsa-sha2-nistp(256|384|521)|sk-ecdsa-sha2-nistp256@openssh\.com|ssh-rsa) [A-Za-z0-9+/]+={0,3} security-agent-dt_[A-Za-z0-9_-]+$' "$FILE"
+exec grep -E '^restrict,port-forwarding,permitlisten="localhost:2[0-9]{4}",command="/bin/false" (ssh-ed25519|sk-ssh-ed25519@openssh\.com|ecdsa-sha2-nistp(256|384|521)|sk-ecdsa-sha2-nistp256@openssh\.com|ssh-rsa) [A-Za-z0-9+/]+={0,3} security-agent-dt_[A-Za-z0-9_-]+$' "$FILE"

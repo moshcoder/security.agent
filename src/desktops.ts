@@ -123,7 +123,7 @@ export class Desktops {
   /** One restricted authorized_keys line per desktop: listen on its own loopback port, nothing else. */
   authorizedKeys(): string {
     const rows = this.db.query('SELECT id, public_key, port FROM desktops ORDER BY port').all() as { id: string; public_key: string; port: number }[]
-    return rows.map((r) => `restrict,port-forwarding,permitlisten="localhost:${r.port}",permitopen="none",command="/bin/false" ${r.public_key} security-agent-${r.id}\n`).join('')
+    return rows.map((r) => `restrict,port-forwarding,permitlisten="localhost:${r.port}",command="/bin/false" ${r.public_key} security-agent-${r.id}\n`).join('')
   }
 
   /** Rewrite the keys file sshd reads (atomic rename, so sshd never sees half a file). */
