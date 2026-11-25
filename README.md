@@ -25,7 +25,7 @@ desktop ──ssh -N -R localhost:<port>:127.0.0.1:7801──▶ secagent-tunnel
 desktop ◀── agent's MCP calls ride back down the same connection ── 127.0.0.1:<port>  (2) server to desktop
 ```
 
-1. **Desktop to server.** A systemd user unit on the desktop dials out and asks sshd to listen on that desktop's own loopback port. The desktop needs no open port, public address or VPN. Its key can do one thing on the server (`restrict,port-forwarding,permitlisten="localhost:<port>",permitopen="none",command="/bin/false"`): no shell, no other forwards.
+1. **Desktop to server.** A systemd user unit on the desktop dials out and asks sshd to listen on that desktop's own loopback port. The desktop needs no open port, public address or VPN. Its key can do one thing on the server (`restrict,port-forwarding,permitlisten="localhost:<port>",command="/bin/false"`, and sshd allows this user remote forwards only, `PermitOpen none`): no shell, no other forwards.
 2. **Server to desktop.** A desktop tool call from the person's agent (`/api/v1/desktops/<id>/call`, MCP `desktop_call`) connects to that port. SSH carries it back to the broker on the desktop with the agent token the person made (`w3bs desktop agents add security-agent`). security.agent sends `Host: 127.0.0.1:7801` itself and never an `Origin`, as the broker requires.
 3. **The person stays in charge.** The broker asks before an agent drives and shows what it does. It stops on Super+Alt+Escape or from the tray. `systemctl --user disable --now security-agent-tunnel` cuts the connection. Removing the desktop on the site drops its key from sshd at once.
 

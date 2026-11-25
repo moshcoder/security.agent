@@ -209,7 +209,7 @@ describe('desktops', () => {
     expect(html).toContain('-R localhost:')
     expect(html).toContain('secagent-tunnel@tunnel.test')
     const line = readFileSync(keys, 'utf8')
-    expect(line).toMatch(/^restrict,port-forwarding,permitlisten="localhost:2\d{4}",permitopen="none",command="\/bin\/false" ssh-ed25519 AAAA\S+ security-agent-dt_/)
+    expect(line).toMatch(/^restrict,port-forwarding,permitlisten="localhost:2\d{4}",command="\/bin\/false" ssh-ed25519 AAAA\S+ security-agent-dt_/)
     expect(line).not.toContain('agent-token')
 
     const list = (await (await req('/api/v1/desktops', { cookie })).json()) as { desktops: { id: string; connected: boolean; state: string }[] }
@@ -228,7 +228,7 @@ describe('desktops', () => {
     expect(sshd('secagent-tunnel', keys)).toBe(line)
     expect(sshd('root', keys)).toBe('')
     const evil = join(TMP, `evil-${Date.now()}`)
-    await Bun.write(evil, `${line}ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ7x5mGv1h0Qe0a2l5bWZQJ0vX8yq6l9y2b1oQ3eZJ3y no-restrictions\nrestrict,port-forwarding,permitlisten="localhost:22",permitopen="none",command="/bin/false" ${PUB2.split(' ').slice(0, 2).join(' ')} security-agent-dt_x\n`)
+    await Bun.write(evil, `${line}ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ7x5mGv1h0Qe0a2l5bWZQJ0vX8yq6l9y2b1oQ3eZJ3y no-restrictions\nrestrict,port-forwarding,permitlisten="localhost:22",command="/bin/false" ${PUB2.split(' ').slice(0, 2).join(' ')} security-agent-dt_x\n`)
     expect(sshd('secagent-tunnel', evil)).toBe(line)
 
     await req(`/desktops/${id}/delete`, { ...form({ csrf }), cookie })
