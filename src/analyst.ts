@@ -18,20 +18,51 @@ import type { Check, Finding, Incident } from './threatcrush.js'
 export type Analysis = { text: string; model: string; provider: string }
 export type Generate = (req: { system: string; user: string; maxTokens: number; temperature?: number }) => Promise<{ text: string; model?: string; provider?: string }>
 
-export const ANALYST_MODELS = 'nemotron-3-nano:4b,qwen3:4b-instruct-2507-q4_K_M,qwen2.5:3b,huihui_ai/qwen3.5-abliterated:9b'
+/**
+ * Tried in order, one at a time. Measured on c0mpute 2026-11-25:
+ *  - nemotron-3-nano:4b reasons before it answers: with a 120-token budget it came back empty, with
+ *    800 it answered correctly in 15 to 35 s. So every call gets at least MIN_TOKENS.
+ *  - The ai-providers router gives up on the whole provider when one model answers empty, so the
+ *    walk down the list happens here, one router per model.
+ *  - Which models have a live node changes by the minute; a missing one fails in under a second.
+ *  - The uncensored 4B (huihui_ai/qwen3.5-abliterated:4b) told an agent to run known malware. It is
+ *    not on this list.
+ */
+export const ANALYST_MODELS = 'nemotron-3-nano:4b,qwen3:4b-instruct-2507-q4_K_M,qwen3:4b,qwen3:8b,huihui_ai/qwen3.5-abliterated:9b'
+const MIN_TOKENS = 800
+/** A person is waiting on a page (Bun.serve's idle limit is 120 s). */
+const DEADLINE_MS = 95_000
 
-let router: { generateText: Generate } | null = null
-const c0mpute = (): Generate => {
-  // A person is waiting on a page: give up after 100 s (Bun.serve's idle limit is 120 s), and move to
-  // the next model if a node streams nothing for 45 s.
-  router ??= createAiProviders({
-    // Instruct models first: the house default (a thinking model) spends a short answer's whole
-    // budget thinking and returns empty. Measured 2026-11-25: nemotron-3-nano:4b answered in 15 s.
-    env: { ...process.env, AI_PAID_FALLBACK: 'off', C0MPUTE_MODELS: process.env.C0MPUTE_MODELS || ANALYST_MODELS },
-    paidFallback: false,
-    c0mpute: { timeoutMs: Number(process.env.C0MPUTE_TIMEOUT_MS) || 100_000, stallMs: Number(process.env.C0MPUTE_STALL_MS) || 45_000 },
-  }) as unknown as { generateText: Generate }
-  return (req) => router!.generateText(req)
+const routers = new Map<string, { generateText: Generate }>()
+const routerFor = (model: string, timeoutMs: number) => {
+  const key = `${model}:${Math.round(timeoutMs / 5000)}`
+  let r = routers.get(key)
+  if (!r) {
+    r = createAiProviders({
+      env: { ...process.env, AI_PAID_FALLBACK: 'off', C0MPUTE_MODELS: model },
+      paidFallback: false,
+      c0mpute: { timeoutMs, stallMs: Math.min(45_000, timeoutMs) },
+    }) as unknown as { generateText: Generate }
+    routers.set(key, r)
+  }
+  return r
+}
+
+const c0mpute = (): Generate => async (req) => {
+  const models = (process.env.C0MPUTE_MODELS || ANALYST_MODELS).split(',').map((m) => m.trim()).filter(Boolean)
+  const end = Date.now() + DEADLINE_MS
+  let last: unknown = null
+  for (const model of models) {
+    const left = end - Date.now()
+    if (left < 5_000) break
+    try {
+      const r = await routerFor(model, left).generateText({ ...req, maxTokens: Math.max(req.maxTokens, MIN_TOKENS) })
+      if (r.text?.trim()) return { ...r, model: r.model || model }
+    } catch (e) {
+      last = e
+    }
+  }
+  throw last instanceof Error ? last : new Error('no c0mpute model answered')
 }
 
 export const analystEnabled = () => !/^(1|true|yes|on)$/i.test(process.env.SECAGENT_ANALYST_OFF ?? '')
