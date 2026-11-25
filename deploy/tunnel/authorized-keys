@@ -1,0 +1,12 @@
+#!/bin/sh
+# sshd AuthorizedKeysCommand for the security.agent desktop tunnels.
+#
+# Installed root-owned at /usr/local/lib/security-agent/authorized-keys and run by
+# sshd as AuthorizedKeysCommandUser nobody. It prints the restricted lines the app
+# wrote (one per desktop: listen on its own loopback port, nothing else) and only
+# for the tunnel user. Every line is checked again here, so a damaged or tampered
+# file can never hand out a shell or an open forward.
+[ "$1" = "secagent-tunnel" ] || exit 0
+FILE=${SECAGENT_TUNNEL_KEYS_TEST:-/var/lib/security-agent-tunnel/tunnel_authorized_keys}
+[ -r "$FILE" ] || exit 0
+exec grep -E '^restrict,port-forwarding,permitlisten="localhost:2[0-9]{4}",permitopen="none",command="/bin/false" (ssh-ed25519|sk-ssh-ed25519@openssh\.com|ecdsa-sha2-nistp(256|384|521)|sk-ecdsa-sha2-nistp256@openssh\.com|ssh-rsa) [A-Za-z0-9+/]+={0,3} security-agent-dt_[A-Za-z0-9_-]+$' "$FILE"
